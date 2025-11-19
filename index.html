@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Generador de Preguntas de Investigación</title>
+
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    background: #f4f7fa;
+    max-width: 800px;
+    margin: 40px auto;
+    padding: 20px;
+  }
+  h2 { text-align: center; color: #003366; }
+  select, button {
+    width: 100%; padding: 12px; margin: 10px 0;
+    font-size: 16px; border-radius: 8px; border: 1px solid #bbb;
+  }
+  button {
+    background: #003366; color: white; cursor: pointer;
+  }
+  button:hover { background: #0055aa; }
+  #resultado {
+    background: #e9f2ff; border-left: 5px solid #f4f7fa;
+    padding: 15px; margin-top: 20px; border-radius: 6px;
+    font-size: 18px; font-weight: bold;
+  }
+</style>
+</head>
+
+<body>
+
+<h2>🔍 Generador Estructurado de Preguntas de Investigación</h2>
+
+   <div class="disclaimer">
+            <p>Esta herramienta es un apoyo para formular preguntas de investigación, pero no reemplaza el criterio del investigador. Es importante verificar que los aspectos seleccionados sean relevantes para la población de estudio, y complementar el proceso con la delimitación del contexto teórico y geográfico de la investigación.</p>
+        </div>
+
+<!-- 1. Tipo de estudio -->
+<label><strong>Tipo de estudio:</strong></label>
+<select id="tipoEstudio" onchange="actualizarVerbos()">
+  <option value="">Seleccione...</option>
+  <option value="Qué elementos o componentes permiten">Exploratorio – Qué</option>
+  <option value="Cuáles elementos o componentes permiten">Exploratorio – Cuáles</option>
+  <option value="Cómo se">Descriptivo – Cómo se</option>
+  <option value="Qué correlación existe entre x y y para">Correlacional – Qué correlación existe entre</option>
+  <option value="Cuál es la causa de">Causal – Cuál es la causa de</option>
+</select>
+
+<!-- 2. Verbo (propósito) -->
+<label><strong>Verbo: (¿Cuál es el alcance de tu investigación?):</strong></label>
+<select id="verbo">
+  <!-- Se llenará dinámicamente -->
+</select>
+
+<!-- 3. Aspecto de interés -->
+<label><strong>Aspecto de interés: ¿Qué aspecto te interesa de acuerdo al propósito de su investigación?</strong></label>
+<select id="aspecto">
+  <option value="">Seleccione...</option>
+  <option value="las necesidades en">Necesidades</option>
+  <option value="los factores que influyen en">Factores</option>
+  <option value="las estrategias implementadas para">Estrategias</option>
+  <option value="los indicadores obtenidos en">Indicadores</option>
+  <option value="los resultados obtenidos en">Resultados</option>
+</select>
+
+<!-- 4. Tema -->
+<label><strong>Tema (contexto): ¿Qué ámbito se ubica tu investigación?:</strong></label>
+<select id="tema">
+  <option value="">Seleccione...</option>
+  <option value="el contexto social">Social</option>
+  <option value="el contexto educativo">Educativo</option>
+  <option value="el contexto ambiental">Ambiental</option>
+  <option value="el contexto tecnológico">Tecnológico</option>
+  <option value="el contexto de la salud">Salud</option>
+</select>
+
+<!-- 5. Población -->
+<label><strong>Población: ¿A quién está dirigido?</strong></label>
+<select id="poblacion">
+  <option value="">Seleccione...</option>
+  <option value="la comunidad">Comunidad</option>
+  <option value="los docentes">Docentes</option>
+  <option value="los estudiantes">Estudiantes</option>
+  <option value="las empresas">Empresas</option>
+  <option value="la población indígena">Población indígena</option>
+</select>
+
+<button onclick="generarPregunta()">Generar Pregunta de Investigación</button>
+
+<div id="resultado"></div>
+
+<script>
+
+// LISTAS DE VERBOS EN AMBAS FORMAS
+const verbosInfinitivo = [
+  "identificar",
+  "aplicar",
+  "analizar",
+  "proponer alternativas para mejorar",
+  "contrastar",
+  "demostrar",
+  "categorizar",
+  "descubrir",
+  "localizar",
+  "reconocer",
+  "formular",
+  "evaluar",
+  "interpretar",
+  "comprobar"
+];
+
+const verbosConSe = [
+  "se identifica",
+  "se aplica",
+  "se analiza",
+  "se proponen alternativas para mejorar",
+  "se contrasta",
+  "se demuestra",
+  "se categoriza",
+  "se descubre",
+  "se localiza",
+  "se reconoce",
+  "se formula",
+  "se evalúa",
+  "se interpreta",
+  "se comprueba"
+];
+
+// FUNCIÓN PARA ACTUALIZAR LOS VERBOS
+function actualizarVerbos() {
+  const tipo = document.getElementById("tipoEstudio").value;
+  const verboSelect = document.getElementById("verbo");
+
+  verboSelect.innerHTML = ""; // limpia
+
+  let listaVerbos = verbosInfinitivo;
+
+  if (tipo.includes("Cómo se")) {
+    listaVerbos = verbosConSe;  // usa la forma "se identifica…"
+  }
+
+  listaVerbos.forEach(v => {
+    const option = document.createElement("option");
+    option.value = v;
+    option.textContent = v.charAt(0).toUpperCase() + v.slice(1);
+    verboSelect.appendChild(option);
+  });
+}
+
+// GENERADOR DE PREGUNTA
+function generarPregunta() {
+  const tipo = document.getElementById("tipoEstudio").value;
+  const verbo = document.getElementById("verbo").value;
+  const aspecto = document.getElementById("aspecto").value;
+  const tema = document.getElementById("tema").value;
+  const poblacion = document.getElementById("poblacion").value;
+  const resultado = document.getElementById("resultado");
+
+  if (!tipo || !verbo || !aspecto || !tema || !poblacion) {
+    resultado.innerHTML = " Por favor selecciona todas las opciones.";
+    return;
+  }
+
+  // Caso especial estudio correlacional
+  if (tipo.includes("correlación")) {
+    // Ahora incluye el verbo en la pregunta correlacional
+    resultado.innerHTML = `<strong>Pregunta generada:</strong><br>
+    ¿${tipo} ${verbo} ${aspecto} y ${poblacion} en ${tema}?`;
+    return;
+  }
+
+  // Pregunta general
+  const pregunta = `¿${tipo} ${verbo} ${aspecto} ${tema}, considerando a ${poblacion}?`;
+  resultado.innerHTML = `<strong>Pregunta generada:</strong><br>${pregunta}`;
+}
+
+// Cargar verbos por defecto al abrir
+actualizarVerbos();
+
+</script>
+
+</body>
